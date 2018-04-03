@@ -1,7 +1,7 @@
 from Box2D import b2Vec2, b2World, b2_dynamicBody
-from gen_world import new_confined_clustered_circles_world
-from sim_types import SimData
-from sph.gridsplat import body_properties
+from ..gen_world import new_confined_clustered_circles_world
+from ..sim_types import SimData
+from ..sph.gridsplat import body_properties
 
 if __name__ == "__main__":
     #uncomment to get the seed of a specific (working) configuration
