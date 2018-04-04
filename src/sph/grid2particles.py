@@ -2,17 +2,29 @@ import numpy as np
 from scipy import interpolate
 
 
-def W_grid_2_particles(W_grid, W_df):
-    xs, ys = W_grid.shape
+def W_grid_2_particles(W_grid, W_df, channel):
+    '''
+    :param W_grid: grid
+    :param W_df: pandas.dataframe
+    :param channel: list restore the information
+                    name you want.
+    :return: interpotion func
+    '''
+    xs, ys = W_grid.shap
+    for col_name in channel:
+        if col_name not in W_df.columns:
+            raise ValuerError('Check the channel.')
+    W_df = W_df[channel]
 
-    # num_channel should be 6 including mass, inertia, 
-    # vx, vy, angle, spin 
-    num_channel = 6
+    # num_channel should be the num of dimension of 
+    # useful information. Like for bodies_grid, it should 
+    # be 6(mass, vx, vy, inertial, angle, spin)
+    num_channel = len(channel)
     z = np.zeros((xs, ys, num_channel))
     for x in range(xs):
         for y in range(ys):
             if not W_grid[x, y]:
-                z[x, y, :] = np.zeros((1, 6))
+                z[x, y, :] = np.zeros((1, num_channel))
                 continue
             info_list = np.asarray(
                 [
