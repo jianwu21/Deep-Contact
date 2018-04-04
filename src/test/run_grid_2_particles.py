@@ -1,7 +1,12 @@
+import numpy as np
 from Box2D import b2Vec2, b2World, b2_dynamicBody
 from ..gen_world import new_confined_clustered_circles_world
 from ..sim_types import SimData
-from ..sph.gridsplat import body_properties
+from ..sph.gridsplat import W_grid_poly6, body_properties
+from ..sph.grid2particles import W_grid_2_particles
+import matplotlib.pyplot as plt
+
+from ..sph.kernel import W_poly6_2D
 
 if __name__ == "__main__":
     #uncomment to get the seed of a specific (working) configuration
@@ -17,7 +22,21 @@ if __name__ == "__main__":
                                          p_hr=b2Vec2(xhi,yhi),
                                          radius_range=(1,1), sigma=sigma_coef,
                                          seed=None)
-    df = body_properties(world)
-    print("world converted to dataframe:\n",df,"\n\n")
-    print("indexing into dataframe to query about body 3's mass : ",
-          df.loc[3,"mass"])
+    h=3
+    xspace, yspace= 1,1
+    W_grid = W_grid_poly6(world,h,(xlow,ylow),(xhi,yhi), xspace, yspace)
+    W_df = body_properties(world)
+    particle_from_grid = W_grid_2_particles(W_grid, W_df)
+    print(particle_from_grid(np.array([1, 2]), np.array([1, 2])))
+    print(W_grid.shape)
+
+# visualize the sparsity pattern
+Wspy = np.copy(W_grid)
+Xsz, Ysz = Wspy.shape
+for i in range(Xsz):
+    for j in range(Ysz):
+        if Wspy[i,j] != 0:
+            Wspy[i,j] = len(Wspy[i,j])
+plt.spy(Wspy)
+plt.show()
+
